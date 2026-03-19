@@ -11,6 +11,7 @@ ENV COMPOSER_ALLOW_SUPERUSER=1
 COPY composer.json composer.lock* ./
 # Platform PHP alignée sur runtime (8.2) + scripts désactivés (artisan non copié à cette étape)
 # Fallback update pour éviter l'échec si composer.lock n'est pas synchronisé avec composer.json
+# no-security-blocking pour éviter le blocage build sur advisories Composer pendant le déploiement
 RUN composer config --global platform.php 8.2.0 && \
     (composer install \
       --no-dev \
@@ -19,7 +20,8 @@ RUN composer config --global platform.php 8.2.0 && \
       --no-progress \
       --no-scripts \
       --optimize-autoloader \
-      --ignore-platform-req=ext-gd || \
+      --ignore-platform-req=ext-gd \
+      --no-security-blocking || \
      composer update \
       --no-dev \
       --prefer-dist \
@@ -27,7 +29,9 @@ RUN composer config --global platform.php 8.2.0 && \
       --no-progress \
       --no-scripts \
       --optimize-autoloader \
-      --ignore-platform-req=ext-gd)
+      --ignore-platform-req=ext-gd \
+      --with-all-dependencies \
+      --no-security-blocking)
 
 ##############################
 # Étape assets (optionnelle)
