@@ -12,7 +12,8 @@ COPY composer.json composer.lock* ./
 # Platform PHP alignée sur runtime (8.2) + scripts désactivés (artisan non copié à cette étape)
 # Fallback update pour éviter l'échec si composer.lock n'est pas synchronisé avec composer.json
 # no-security-blocking pour éviter le blocage build sur advisories Composer pendant le déploiement
-RUN composer config --global platform.php 8.2.0 && \
+RUN mkdir -p database/seeds database/factories && \
+    composer config --global platform.php 8.2.0 && \
     (composer install \
       --no-dev \
       --prefer-dist \
