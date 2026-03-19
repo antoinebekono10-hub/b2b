@@ -22,8 +22,8 @@ yarn-error.log
 .idea/
 /public/*
 updates/
-composer.lock
 *.lock
+!composer.lock
 resources/lang/en.json
 updates.zip
 ecommerce.zip
@@ -34,4 +34,5 @@ install.zip
 public/uploads.zip
 .env
 public/all
+
 
