@@ -9,15 +9,15 @@ WORKDIR /app
 ENV COMPOSER_ALLOW_SUPERUSER=1
 # Accepte l'absence de composer.lock (fallback sur composer.json)
 COPY composer.json composer.lock* ./
-# Platform PHP alignée sur runtime (8.2) + pas d’audit bloquant et ext-gd ignoré (présent en runtime)
+# Platform PHP alignée sur runtime (8.2) + scripts désactivés (artisan non copié à cette étape) + ext-gd ignoré pendant le build vendor (présent en runtime)
 RUN composer config --global platform.php 8.2.0 && \
     composer install \
       --no-dev \
       --prefer-dist \
       --no-interaction \
       --no-progress \
+      --no-scripts \
       --optimize-autoloader \
-      --no-audit \
       --ignore-platform-req=ext-gd
 
 ##############################
