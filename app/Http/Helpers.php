@@ -1312,9 +1312,20 @@ if (!function_exists('app_timezone')) {
 if (!function_exists('uploaded_asset')) {
     function uploaded_asset($id)
     {
-        if (($asset = Upload::find($id)) != null) {
+        if (empty($id)) {
+            return static_asset('assets/img/placeholder.jpg');
+        }
+
+        try {
+            $asset = Upload::find($id);
+        } catch (\Throwable $th) {
+            return static_asset('assets/img/placeholder.jpg');
+        }
+
+        if ($asset != null) {
             return $asset->external_link == null ? my_asset($asset->file_name) : $asset->external_link;
         }
+
         return static_asset('assets/img/placeholder.jpg');
     }
 }
@@ -1405,9 +1416,13 @@ if (!function_exists('isUnique')) {
 if (!function_exists('get_setting')) {
     function get_setting($key, $default = null, $lang = false)
     {
-        $settings = Cache::remember('business_settings', 86400, function () {
-            return BusinessSetting::all();
-        });
+        try {
+            $settings = Cache::remember('business_settings', 86400, function () {
+                return BusinessSetting::all();
+            });
+        } catch (\Throwable $th) {
+            return $default;
+        }
 
         if ($lang == false) {
             $setting = $settings->where('type', $key)->first();
@@ -1712,9 +1727,13 @@ if (!function_exists('calculateCommissionAffilationClubPoint')) {
 if (!function_exists('addon_is_activated')) {
     function addon_is_activated($identifier, $default = null)
     {
-        $addons = Cache::remember('addons', 86400, function () {
-            return Addon::all();
-        });
+        try {
+            $addons = Cache::remember('addons', 86400, function () {
+                return Addon::all();
+            });
+        } catch (\Throwable $th) {
+            return false;
+        }
 
         $activation = $addons->where('unique_identifier', $identifier)->where('activated', 1)->first();
         return $activation == null ? false : true;
@@ -1858,16 +1877,32 @@ if (!function_exists('get_active_taxes')) {
 if (!function_exists('get_system_language')) {
     function get_system_language()
     {
-        $language_query = Language::query();
+        $locale = Session::get('locale', Config::get('app.locale', 'en'));
 
-        $locale = 'en';
-        if (Session::has('locale')) {
-            $locale = Session::get('locale', Config::get('app.locale'));
+        try {
+            $language = Language::query()->where('code', $locale)->first();
+
+            if (!$language) {
+                $language = Language::query()->where('code', Config::get('app.locale', 'en'))->first();
+            }
+
+            if (!$language) {
+                $language = Language::query()->where('code', 'en')->first();
+            }
+
+            if (!$language) {
+                $language = Language::query()->first();
+            }
+        } catch (\Throwable $th) {
+            $language = null;
         }
 
-        $language_query->where('code',  $locale);
+        if (!$language) {
+            $language = new Language();
+            $language->code = $locale ?: 'en';
+        }
 
-        return $language_query->first();
+        return $language;
     }
 }
 
@@ -1885,8 +1920,33 @@ if (!function_exists('get_all_active_language')) {
 if (!function_exists('get_session_language')) {
     function get_session_language()
     {
-        $language_query = Language::query();
-        return $language_query->where('code', Session::get('locale', Config::get('app.locale')))->first();
+        $locale = Session::get('locale', Config::get('app.locale', 'en'));
+
+        try {
+            $language = Language::query()->where('code', $locale)->first();
+
+            if (!$language) {
+                $language = Language::query()->where('code', Config::get('app.locale', 'en'))->first();
+            }
+
+            if (!$language) {
+                $language = Language::query()->where('code', 'en')->first();
+            }
+
+            if (!$language) {
+                $language = Language::query()->first();
+            }
+        } catch (\Throwable $th) {
+            $language = null;
+        }
+
+        if (!$language) {
+            $language = new Language();
+            $language->code = $locale ?: 'en';
+            $language->rtl = 0;
+        }
+
+        return $language;
     }
 }
 
