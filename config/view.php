@@ -28,6 +28,8 @@ return [
     |
     */
 
-    'compiled' => realpath(storage_path('framework/views')),
+    // Ne pas utiliser realpath ici: si le dossier n'existe pas encore au boot,
+    // realpath() retourne false et Laravel lève "Please provide a valid cache path".
+    'compiled' => env('VIEW_COMPILED_PATH', storage_path('framework/views')),
 
 ];
