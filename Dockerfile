@@ -40,6 +40,10 @@ RUN mkdir -p database/seeds database/factories && \
 FROM node:18-bullseye AS assets
 ARG BUILD_ASSETS=true
 WORKDIR /app
+
+# Installe Python pour node-sass (compilé natif)
+RUN apt-get update && apt-get install -y --no-install-recommends python3 make g++ && rm -rf /var/lib/apt/lists/*
+
 COPY package.json yarn.lock* ./
 # Installe les dépendances uniquement si BUILD_ASSETS=true
 RUN if [ "$BUILD_ASSETS" = "true" ]; then \
