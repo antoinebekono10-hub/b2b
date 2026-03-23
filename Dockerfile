@@ -38,7 +38,7 @@ RUN mkdir -p database/seeds database/factories && \
 # Étape assets (optionnelle)
 ##############################
 FROM node:18-bullseye AS assets
-ARG BUILD_ASSETS=false
+ARG BUILD_ASSETS=true
 WORKDIR /app
 COPY package.json yarn.lock* ./
 # Installe les dépendances uniquement si BUILD_ASSETS=true
