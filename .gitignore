@@ -4,7 +4,6 @@
 .env.php
 
 /node_modules
-/public/assets
 /public/storage
 /public/uploads
 /storage/*.key
@@ -21,6 +20,8 @@ yarn-error.log
 .DS_Store
 .idea/
 /public/*
+!/public/assets/
+!/public/assets/**
 updates/
 *.lock
 !composer.lock
